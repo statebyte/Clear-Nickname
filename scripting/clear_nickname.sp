@@ -260,7 +260,7 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 		OpenMenu(iClient);
 
 		LogToFile(g_sLogPath, "%T", "AdminKeyAdded", LANG_SERVER, iClient, sValue);
-		PrintToChat(iClient, "%t", "KeyAdded", sValue);
+		PrintToChat(iClient, "%t%t", "ChatPrefix", "KeyAdded", sValue);
 		return Plugin_Handled;
 	}
 
@@ -368,7 +368,7 @@ int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 				case 2:
 				{
 					LoadConfig();
-					PrintToChat(iClient, "%t", "ConfigReloaded");
+					PrintToChat(iClient, "%t%t", "ChatPrefix", "ConfigReloaded");
 					OpenMenu(iClient);
 				}
 				default:
@@ -396,7 +396,7 @@ int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 						{
 							SetGlobalTransTarget(iClient);
 							SetClientName(iTarget, sName);
-							PrintToChat(iClient, "%t", "NicknameChanged", sOldName, sName, iCountKey);
+							PrintToChat(iClient, "%t%t", "ChatPrefix", "NicknameChanged", sOldName, sName, iCountKey);
 							LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
 						}
 					}
@@ -458,9 +458,9 @@ Action cmd_ClearName(int iClient, int iArgs)
 		if(iCountKey > 0)
 		{
 			SetClientName(iClient, sName);
-			PrintToChat(iClient, "%t", "AdvertFound", iCountKey);
+			PrintToChat(iClient, "%t%t", "ChatPrefix", "AdvertFound", iCountKey);
 		}
-		else PrintToChat(iClient, "%t", "NotFound");
+		else PrintToChat(iClient, "%t%t", "ChatPrefix", "NotFound");
 	}
 
 	return Plugin_Handled;
@@ -576,7 +576,7 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 
 		if(Result == Plugin_Changed)
 		{
-			PrintToChat(iClient, "%t", "AutoAdvertFound", iCountKey);
+			PrintToChat(iClient, "%t%t", "ChatPrefix", "AutoAdvertFound", iCountKey);
 			LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, sOldName, sNewName, iCountKey);
 			SetClientName(iClient, sNewName);
 			return Plugin_Changed;

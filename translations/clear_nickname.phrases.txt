@@ -1,85 +1,105 @@
 "Phrases"
 {
+	"ChatPrefix"
+	{
+		"en"        "[SM] "
+		"ru"        "[SM] "
+		"ua"        "[SM] "
+	}
+
 	"CheckAdvert"
 	{
-		"ru"		"Проверка рекламы в никнейме"
 		"en"        "Check ads in nickname"
+		"ru"		"Проверка рекламы в никнейме"
+		"ua"        "Перевірка реклами в нікнеймі"
 	}
 
 	"AddSite"
 	{
-		"ru"        "Добавить сайт"
 		"en"        "Add Site"
+		"ru"        "Добавить сайт"
+		"ua"        "Додати сайт"
 	}
 
 	"RefreshList"
 	{
-		"ru"        "Обновить список игроков"
 		"en"        "Refresh players list"
+		"ru"        "Обновить список игроков"
+		"ua"        "Оновити список гравців"
 	}
 
 	"ReloadConfig"
 	{
-		"ru"        "Перезагрузить конфиг"
 		"en"        "Reload Config"
+		"ru"        "Перезагрузить конфиг"
+		"ua"        "Перезавантажити конфіг"
 	}
 
 	"ConfigReloaded"
 	{
-		"ru"        "Конфиг перезагружен"
-		"en"        "Config reloaded"
+		"en"        "Config reloaded!"
+		"ru"        "Конфиг перезагружен!"
+		"ua"        "Конфіг перезавантажений!"
 	}
 	
 	"NicknameChanged"
 	{
 		"#format"	"{1:s},{2:s}{3:i}"
-		"ru"        "Никнейм изменён (OLD: {1} - NEW: {2}), найдено {3} ключей"
-		"en"        "Nickname changed (OLD: {1} - NEW: {2}), keys found - {3}"
+		"en"        "Nickname changed (OLD: {1} - NEW: {2}), keys found - {3}."
+		"ru"        "Никнейм изменён (OLD: {1} - NEW: {2}), найдено {3} ключе."
+		"ua"        "Нікнейм змінений (OLD: {1} - NEW: {2}), знайдено {3} ключів."
 	}
 
 	"KeyAdded"
 	{
 		"#format"	"{1:s}"
-		"ru"        "Ключ {1} успешно добавлен"
-		"en"        "Key {1} added successfully"
+		"en"        "Key {1} added successfully!"
+		"ru"        "Ключ {1} успешно добавлен!"
+		"ua"        "Ключ {1} успішно доданий!"
 	}
 
 	"AdminKeyAdded"
 	{
 		"#format"	"{1:L},{2:s}"
-		"ru"        "Администратор %L добавил ключ %s"
-		"en"        "The {1} administrator added the ({2}) key"
+		"en"        "The {1} administrator added the ({2}) key!"
+		"ru"        "Администратор %L добавил ключ %s!"
+		"ua"        "Адміністратор %L додав ключ %s!"
 	}
 	
 	"AdvertFound"
 	{
 		"#format"	"{1:i}"
-		"ru"        "Ваш никнейм имел {1} запрещенных ключей."
 		"en"        "Your nickname had {1} prohibited keys."
+		"ru"        "Ваш никнейм имел {1} запрещенных ключей."
+		"ua"        "Ваш нікнейм мав {1} заборонених ключів."
 	}
 
 	"NotFound"
 	{
-		"ru"        "В вашем никнейме не найдены запрещенные ключи."
 		"en"        "No prohibited keys found in your nickname."
+		"ru"        "В вашем никнейме не найдены запрещенные ключи."
+		"ua"        "У вашому нікнеймі не знайдені заборонені ключі."
 	}
 
 	"AutoAdvertFound"
 	{
 		"#format"	"{1:i}"
-		"ru"        "AUTO: Ваш никнейм имел {1} запрещенных ключей."
 		"en"        "AUTO: Your nickname had {1} prohibited keys"
+		"ru"        "AUTO: Ваш никнейм имел {1} запрещенных ключей."
+		"ua"        "AUTO: Ваш нікнейм мав {1} заборонених ключів."
 	}
 
 	"NoAdvert"
 	{
-		"ru"        "Нет рекламы"
 		"en"        "No ads"
+		"ru"        "Нет рекламы"
+		"ua"        "Немає реклами"
 	}
 
 	"MenuDescription"
 	{
-		"ru"        "Введите в чат ключ который будет удалён при проверке никнейма."
 		"en"        "Enter the key in the chat that will be deleted when checking the nickname."
+		"ru"        "Введите в чат ключ который будет удалён при проверке никнейма."
+		"ua"        "Введіть в чат ключ який буде видалений при перевірці никнейма."
 	}
 }
