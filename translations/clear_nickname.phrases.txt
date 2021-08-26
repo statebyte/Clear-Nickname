@@ -1,0 +1,85 @@
+"Phrases"
+{
+	"CheckAdvert"
+	{
+		"ru"		"Проверка рекламы в никнейме"
+        "en"        "Check ads in nickname"
+	}
+
+    "AddSite"
+    {
+        "ru"        "Добавить сайт"
+        "en"        "Add Site"
+    }
+
+    "RefreshList"
+    {
+        "ru"        "Обновить список игроков"
+        "en"        "Refresh players list"
+    }
+
+    "ReloadConfig"
+    {
+        "ru"        "Перезагрузить конфиг"
+        "en"        "Reload Config"
+    }
+
+    "ConfigReloaded"
+    {
+        "ru"        "Конфиг перезагружен"
+        "en"        "Config reloaded"
+    }
+    
+    "NicknameChanged"
+    {
+        "#format"	"{1:s},{2:s}{3:i}"
+        "ru"        "Никнейм изменён (OLD: {1} - NEW: {2}), найдено {3} ключей"
+        "en"        "Nickname changed (OLD: {1} - NEW: {2}), keys found - {3}"
+    }
+
+    "KeyAdded"
+    {
+        "#format"	"{1:s}"
+        "ru"        "Ключ {1} успешно добавлен"
+        "en"        "Key {1} added successfully"
+    }
+
+    "AdminKeyAdded"
+    {
+        "#format"	"{1:L},{2:s}"
+        "ru"        "Администратор %L добавил ключ %s"
+        "en"        "The {1} administrator added the ({2}) key"
+    }
+    
+    "AdvertFound"
+    {
+        "#format"	"{1:i}"
+        "ru"        "Ваш никнейм имел {1} запрещенных ключей."
+        "en"        "Your nickname had {1} prohibited keys."
+    }
+
+    "NotFound"
+    {
+        "ru"        "В вашем никнейме не найдены запрещенные ключи."
+        "en"        "No prohibited keys found in your nickname."
+    }
+
+    "AutoAdvertFound"
+    {
+        "#format"	"{1:i}"
+        "ru"        "AUTO: Ваш никнейм имел {1} запрещенных ключей."
+        "en"        "AUTO: Your nickname had {1} prohibited keys"
+    }
+
+    "NoAdvert"
+    {
+        "ru"        "Нет рекламы"
+        "en"        "No ads"
+    }
+
+    "MenuDescription"
+    {
+        "ru"        "Введите в чат ключ который будет удалён при проверке никнейма."
+        "en"        "Enter the key in the chat that will be deleted when checking the nickname."
+    }
+}
