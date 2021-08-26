@@ -180,7 +180,7 @@ void DB_CreateTables()
 		char sQuery[1024];
 		g_hDatabase.Format(sQuery, sizeof sQuery, "CREATE TABLE IF NOT EXISTS `%s` ( \
 				`id` int(11) NOT NULL AUTO_INCREMENT, \
-				`key_word` varchar(255) NOT NULL UNIQUE, \
+				`key_word` varchar(64) NOT NULL UNIQUE, \
 				`account_id` int(11) DEFAULT 0, \
 				PRIMARY KEY (`id`) \
 			) ENGINE = InnoDB CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;", DB_TABLENAME);
@@ -426,7 +426,6 @@ void HookMsg(int iClient)
 	hMenu.ExitButton = true;
 	hMenu.ExitBackButton = true;
 	hMenu.Display(iClient, MENU_TIME_FOREVER);
-
 }
 
 int Handler_HookMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
@@ -544,8 +543,8 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 
 	// Защита от спама игроков
 	#if CHECK_NICKNAMESPAM == 1
-	static int iTime[MAXPLAYERS+1], iCount[MAXPLAYERS+1];
 	{
+		static int iTime[MAXPLAYERS+1], iCount[MAXPLAYERS+1];
 		//PrintToChatAll("CHECK %i %i", iTime[iClient], iCount[iClient]);
 		if(iTime[iClient] >= GetTime())
 		{
