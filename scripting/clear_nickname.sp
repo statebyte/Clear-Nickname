@@ -3,12 +3,12 @@
 #include <adminmenu>
 
 #define CONFIG_REPLACE_PATH "configs/clear_nickname/clear_nickname.ini"
-#define CONFIG_LOG_PATH "logs/clear_nickname.log"
 #define DEFAULT_NULL_NICKNAME "unnamed"
 
 #define DB_NAMESECTION "clear_nickname"
 #define DB_TABLENAME "clear_nickname"
 
+#define RECURSIVE_SEARCH 0 // Вкл/выкл рекурсивный поиск (ПОВТОРЯЮЩИЕСЯ КЛЮЧИ)
 #define SENSETIVE false // Чуствительно ли к регистру?
 #define CHECK_NICKNAMESPAM 1 // Проверять на наличиее спама от игроков
 #define COUNT_OF_SECONDS 5
@@ -25,7 +25,7 @@ public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
 	author	=	"FIVE, Domikuss",
-	version	=	"1.0.0",
+	version	=	"1.0.1",
 	url		=	"https://hlmod.ru"
 };
 
@@ -34,12 +34,12 @@ public void OnPluginStart()
 	LoadTranslations("clear_nickname.phrases");
     
 	char sPath[PLATFORM_MAX_PATH];
-	BuildPath(Path_SM, sPath, sizeof(sPath), "logs/clear_name");
+	BuildPath(Path_SM, sPath, sizeof(sPath), "logs/clear_nickname");
 	if(!DirExists(sPath)) CreateDirectory(sPath, 511);
 
 	char szBuffer[256];
 	FormatTime(szBuffer, sizeof(szBuffer), "%F", GetTime());
-	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/clear_name/log_%s.log", szBuffer);
+	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/clear_nickname/log_%s.log", szBuffer);
 	
 	g_hReplaceKeys = new ArrayList(ByteCountToCells(NICKNAME_COUNT));
 
@@ -436,7 +436,7 @@ Action cmd_ClearName(int iClient, int iArgs)
 
 Action cmd_ClearNameReload(int iClient, int iArgs)
 {
-	PrintToConsole(iClient, "Конфиг перезагружается");
+	PrintToConsole(iClient, "%t", "ConfigReloaded");
 	LoadConfig();
 
 	return Plugin_Handled;
@@ -528,9 +528,8 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 		{
 			//PrintToChatAll("CHECK NAMI CLEAR");
 			iCount[iClient] = 0;
+			iTime[iClient] = GetTime() + COUNT_OF_SECONDS;
 		}
-		
-		iTime[iClient] = GetTime() + COUNT_OF_SECONDS;
 	}
 	#endif
 	
@@ -612,14 +611,13 @@ int CheckClientName(char[] sNewName, int iMaxLen)
 		strcopy(sNewName, iMaxLen, DEFAULT_NULL_NICKNAME);
 	}
 
-	
-	/*
+	#if RECURSIVE_SEARCH 1
 	// Если было найдены ключ и из-за смещения ключ был не определён.
 	if(iCountKeys > 0)
 	{
 		iCountKeys += CheckClientName(sNewName, iMaxLen);
 	}
-	*/
+	#endif
 
 	return iCountKeys;
 }
