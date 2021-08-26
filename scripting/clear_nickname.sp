@@ -32,7 +32,7 @@ public Plugin myinfo =
 public void OnPluginStart()
 {
 	LoadTranslations("clear_nickname.phrases");
-    
+
 	char sPath[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, sPath, sizeof(sPath), "logs/clear_nickname");
 	if(!DirExists(sPath)) CreateDirectory(sPath, 511);
@@ -54,10 +54,10 @@ public void OnPluginStart()
 	AddCommandListener(Command_Say, "say2");
 	AddCommandListener(Command_Say, "say_team");
 
-	if (LibraryExists("adminmenu"))
+	if(LibraryExists("adminmenu"))
 	{
 		TopMenu hTopMenu;
-		if ((hTopMenu = GetAdminTopMenu()) != null) // Если админ-меню уже создано
+		if((hTopMenu = GetAdminTopMenu()) != null) // Если админ-меню уже создано
 		{
 			// Вызываем ф-ю, в которой добавляется пункт в админ-меню
 			OnAdminMenuReady(hTopMenu);
@@ -77,14 +77,13 @@ Action cmd_ClearNameExport(int iClient, int iArgs)
 		if(FileExists(sPath))
 		{
 			File hFile = OpenFile(sPath, "r", false);
-			
 
-			if (hFile != null)
+			if(hFile != null)
 			{
 				Transaction hTxn = new Transaction();
 				
 				int icount;
-				while(!hFile.EndOfFile() && hFile.ReadLine(szBuffer, sizeof(szBuffer))) 
+				while(!hFile.EndOfFile() && hFile.ReadLine(szBuffer, sizeof(szBuffer)))
 				{
 					TrimString(szBuffer);
 					char sQuery[128];
@@ -110,12 +109,12 @@ Action cmd_ClearNameExport(int iClient, int iArgs)
 	return Plugin_Handled;
 }
 
-public void SQL_TxnCallback_Success(Database hDatabase, any Data, int iNumQueries, DBResultSet[] results, any[] QueryData)
+void SQL_TxnCallback_Success(Database hDatabase, any Data, int iNumQueries, DBResultSet[] results, any[] QueryData)
 {
 	PrintToServer("[clear_nickname] Export: Success export to DB");
 }
 
-public void SQL_TxnCallback_Failure(Database hDatabase, any Data, int iNumQueries, const char[] szError, int iFailIndex, any[] QueryData)
+void SQL_TxnCallback_Failure(Database hDatabase, any Data, int iNumQueries, const char[] szError, int iFailIndex, any[] QueryData)
 {
 	LogError("SQL_TxnCallback_Failure: %s", szError);
 }
@@ -127,16 +126,16 @@ void LoadDatabase()
 		g_bDB = true;
 		Database.Connect(ConnectCallBack, DB_NAMESECTION);
 	}
-	else 
+	else
 	{
 		g_bDB = false;
 		LoadConfig();
 	}
 }
 
-public void ConnectCallBack (Database hDB, const char[] szError, any data) // Пришел результат соединения
+void ConnectCallBack(Database hDB, const char[] szError, any data) // Пришел результат соединения
 {
-	if (hDB == null || szError[0]) // Соединение не удачное
+	if(hDB == null || szError[0]) // Соединение не удачное
 	{
 		SetFailState("Database failure: %s", szError); // Отключаем плагин
 		return;
@@ -152,7 +151,7 @@ public void ConnectCallBack (Database hDB, const char[] szError, any data) // П
 void DB_CreateTables()
 {
 	static bool bCrateTables;
-	if (!bCrateTables)
+	if(!bCrateTables)
 	{
 		bCrateTables = true;
 
@@ -186,26 +185,26 @@ void DB_LoadKeys()
 	g_hDatabase.Query(SQL_Callback_LoadKeys, sQuery);
 }
 
-public void SQL_Default_Callback(Database hDatabase, DBResultSet hResult, const char[] sError, any QueryID)
+void SQL_Default_Callback(Database hDatabase, DBResultSet hResult, const char[] sError, any QueryID)
 {
-	if (!DB_CheckDatabaseConnection(sError, "SQL_Callback_CreateTables"))
+	if(!DB_CheckDatabaseConnection(sError, "SQL_Callback_CreateTables"))
 	{
 		return;
 	}
 }
 
-public void SQL_Callback_CreateTables(Database hDatabase, DBResultSet hResult, const char[] sError, any data)
+void SQL_Callback_CreateTables(Database hDatabase, DBResultSet hResult, const char[] sError, any data)
 {
-	if (!DB_CheckDatabaseConnection(sError, "SQL_Callback_CreateTables"))
+	if(!DB_CheckDatabaseConnection(sError, "SQL_Callback_CreateTables"))
 	{
 		g_hDatabase.Query(SQL_Default_Callback, "SET NAMES 'utf8mb4'", 1);
 		g_hDatabase.Query(SQL_Default_Callback, "SET CHARSET 'utf8mb4'", 2);
 	}
 }
 
-public void SQL_Callback_LoadKeys(Database hDatabase, DBResultSet hResult, const char[] sError, any QueryID)
+void SQL_Callback_LoadKeys(Database hDatabase, DBResultSet hResult, const char[] sError, any QueryID)
 {
-	if (!DB_CheckDatabaseConnection(sError, "SQL_Callback_LoadKeys"))
+	if(!DB_CheckDatabaseConnection(sError, "SQL_Callback_LoadKeys"))
 	{
 		return;
 	}
@@ -248,7 +247,7 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 
 public void OnLibraryRemoved(const char[] szName)
 {
-	if (!strcmp(szName, "adminmenu"))
+	if(!strcmp(szName, "adminmenu"))
 	{
 		g_hTopMenu = null;
 	}
@@ -258,7 +257,7 @@ public void OnAdminMenuReady(Handle aTopMenu)
 {
 	TopMenu hTopMenu = TopMenu.FromHandle(aTopMenu);
 
-	if (hTopMenu == g_hTopMenu)
+	if(hTopMenu == g_hTopMenu)
 	{
 		return;
 	}
@@ -267,13 +266,13 @@ public void OnAdminMenuReady(Handle aTopMenu)
 
 	TopMenuObject hMyCategory = g_hTopMenu.FindCategory("PlayerCommands");
 
-	if (hMyCategory != INVALID_TOPMENUOBJECT)
+	if(hMyCategory != INVALID_TOPMENUOBJECT)
 	{
 		g_hTopMenu.AddItem("clearname", Handler_MenuClearName, hMyCategory, "sm_clearname_menu", ADMFLAG_SLAY, "Проверка ника на рекламу");
 	}
 }
 
-public void Handler_MenuClearName(TopMenu hMenu, TopMenuAction action, TopMenuObject object_id, int iClient, char[] sBuffer, int maxlength)
+void Handler_MenuClearName(TopMenu hMenu, TopMenuAction action, TopMenuObject object_id, int iClient, char[] sBuffer, int maxlength)
 {
 	switch (action)
 	{
@@ -291,34 +290,35 @@ void OpenMenu(int iClient)
 
 	hMenu.SetTitle("%t\n \n", "CheckAdvert");
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "AddSite");
-	hMenu.AddItem("addkey", szBuffer);
+	hMenu.AddItem(NULL_STRING, szBuffer);
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "RefreshList");
-	hMenu.AddItem("refreshplayers", szBuffer);
+	hMenu.AddItem(NULL_STRING, szBuffer);
 	FormatEx(szBuffer, sizeof(szBuffer), "%t\n \n", "ReloadConfig");
-	hMenu.AddItem("reloadconfig", szBuffer);
-	for(int i = 1; i <= MaxClients; i++) if(IsClientInGame(i) && !IsFakeClient(i))
+	hMenu.AddItem(NULL_STRING, szBuffer);
+
+	char sBuffer[4], sName[64];
+	for(int i = 1; i <= MaxClients; i++)
 	{
-		char sBuffer[4],sName[64];
-		IntToString(i, sBuffer, sizeof(sBuffer));
-		
-		int iStyle = ITEMDRAW_DEFAULT;
-
-		GetClientName(i, sName, sizeof(sName));
-		int iCount = CheckClientName(sName, sizeof(sName));
-
-		GetClientName(i, sName, sizeof(sName));
-		if(iCount == 0) 
+		if(IsClientInGame(i) && !IsFakeClient(i))
 		{
-			FormatEx(sName, sizeof(sName), "%N [%t]", i, "NoAdvert");
-			iStyle = ITEMDRAW_DISABLED;
-		}
+			GetClientName(i, sName, sizeof(sName));
+			IntToString(i, sBuffer, sizeof(sBuffer));
 
-		hMenu.AddItem(sBuffer, sName, iStyle);
+			if(CheckClientName(sName, sizeof(sName)) == 0)
+			{
+				FormatEx(sName, sizeof(sName), "%N [%t]", i, "NoAdvert");
+				hMenu.AddItem(sBuffer, sName, ITEMDRAW_DISABLED);
+			}
+			else
+			{
+				hMenu.AddItem(sBuffer, sName, ITEMDRAW_DEFAULT);
+			}
+		}
 	}
 	hMenu.Display(iClient, MENU_TIME_FOREVER);
 }
 
-public int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
+int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 {
 	switch(action)
 	{
@@ -332,44 +332,50 @@ public int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iI
 		}
 		case MenuAction_Select:
 		{
-			char szInfo[64], sName[NICKNAME_COUNT], sOldName[NICKNAME_COUNT];
-			hMenu.GetItem(iItem, szInfo, sizeof(szInfo));
-
-			if(!strcmp(szInfo, "addkey"))
+			switch(iItem)
 			{
-				HookMsg(iClient);
-				return 0;
+				case 0:
+				{
+					HookMsg(iClient);
+				}
+				case 1:
+				{
+					OpenMenu(iClient);
+				}
+				case 2:
+				{
+					LoadConfig();
+					PrintToChat(iClient, "%t", "ConfigReloaded");
+					OpenMenu(iClient);
+				}
+				default:
+				{
+					#define iTarget iItem
+
+					static char szInfo[4];
+					static char sName[NICKNAME_COUNT];
+					static char sOldName[NICKNAME_COUNT];
+
+					hMenu.GetItem(iItem, szInfo, sizeof(szInfo));
+
+					iTarget = StringToInt(szInfo);
+
+					GetClientName(iTarget, sName, sizeof(sName));
+					sOldName = sName;
+
+					int iCountKey = CheckClientName(sName, sizeof(sName));
+
+					if(iCountKey > 0)
+					{
+						SetGlobalTransTarget(iClient);
+						SetClientName(iTarget, sName);
+						PrintToChat(iClient, "%t", "NicknameChanged", sOldName, sName, iCountKey);
+						LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+					}
+
+					OpenMenu(iClient);
+				}
 			}
-
-			if(!strcmp(szInfo, "refreshplayers"))
-			{
-				OpenMenu(iClient);
-				return 0;
-			}
-
-			if(!strcmp(szInfo, "reloadconfig"))
-			{
-				LoadConfig();
-				PrintToChat(iClient, "%t", "ConfigReloaded");
-				OpenMenu(iClient);
-				return 0;
-			}
-
-			int iTarget = StringToInt(szInfo);
-			GetClientName(iTarget, sName, sizeof(sName));
-
-			sOldName = sName;
-				
-			int iCountKey = CheckClientName(sName, sizeof(sName));
-
-			if(iCountKey > 0)
-			{
-				SetGlobalTransTarget(iClient);
-				SetClientName(iTarget, sName);
-				PrintToChat(iClient, "%t", "NicknameChanged", sOldName, sName, iCountKey);
-				LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
-			}
-			OpenMenu(iClient);
 		}
 	}
 
@@ -381,7 +387,6 @@ void HookMsg(int iClient)
 	g_bHookMsg[iClient] = true;
 	
 	char szBuffer[128];
-	
 
 	Menu hMenu = new Menu(Handler_HookMenu);
 
@@ -452,15 +457,17 @@ void LoadConfig()
 	}
 	else 
 	{
-		char sPath[PLATFORM_MAX_PATH], szBuffer[256];
+		char sPath[PLATFORM_MAX_PATH];
 		BuildPath(Path_SM, sPath, sizeof(sPath), CONFIG_REPLACE_PATH);
 
 		if(FileExists(sPath))
 		{
 			File hFile = OpenFile(sPath, "r", false);
 
-			if (hFile != null)
+			if(hFile != null)
 			{
+				char szBuffer[256];
+
 				while(!hFile.EndOfFile() && hFile.ReadLine(szBuffer, sizeof(szBuffer))) 
 				{
 					TrimString(szBuffer);
@@ -568,7 +575,7 @@ void AddKey(char[] sKey, int iClient = 0)
 		{
 			File hFile = OpenFile(sPath, "a+", false);
 
-			if (hFile != null)
+			if(hFile != null)
 			{
 				hFile.WriteLine(sKey);
 				g_hReplaceKeys.PushString(sKey);
@@ -584,19 +591,17 @@ void AddKey(char[] sKey, int iClient = 0)
 int CheckClientName(char[] sNewName, int iMaxLen)
 {
 	int iCountKeys = 0;
-	int iSize = g_hReplaceKeys.Length;
-
 	char sKey[NICKNAME_COUNT], szBuffer[2][NICKNAME_COUNT];
 
-	for(int i = 0; i < iSize; i++)
+	for(int i = 0, iSize = g_hReplaceKeys.Length, iLen, iPos; i < iSize; i++)
 	{
 		g_hReplaceKeys.GetString(i, sKey, sizeof(sKey));
-		int iLen = strlen(sKey);
+		iLen = strlen(sKey);
 
-		int iPos = StrContains(sNewName, sKey, SENSETIVE);
+		iPos = StrContains(sNewName, sKey, SENSETIVE);
 		if(iPos != -1)
 		{
-			strcopy( szBuffer[1], sizeof(szBuffer[]), sNewName[iPos+iLen]);
+			strcopy(szBuffer[1], sizeof(szBuffer[]), sNewName[iPos + iLen]);
 			sNewName[iPos] = EOS;
 			FormatEx(szBuffer[0], sizeof(szBuffer[]), "%s%s", sNewName, szBuffer[1]);
 			strcopy( sNewName, iMaxLen, szBuffer[0]);
