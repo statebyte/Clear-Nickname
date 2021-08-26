@@ -1,4 +1,4 @@
 plugins
-.rar
-.zip
-.smx
+*.rar
+*.zip
+*.smx
