@@ -20,14 +20,36 @@ ArrayList g_hReplaceKeys;
 TopMenu g_hTopMenu = null;
 bool g_bHookMsg[MAXPLAYERS+1], g_bDB;
 Database g_hDatabase;
+Handle g_hGFwd_OnFilterCheckPre;
 
 public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
 	author	=	"FIVE, Domikuss",
-	version	=	"1.0.1",
+	version	=	"1.1.0",
 	url		=	"https://hlmod.ru"
 };
+
+public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] szError, int iErr_max)
+{
+	g_hGFwd_OnFilterCheckPre = CreateGlobalForward("CN_OnFilterCheckPre", ET_Hook, Param_Cell, Param_String, Param_String, Param_Cell);
+
+	RegPluginLibrary("ClearNickname");
+	
+	return APLRes_Success;
+}
+
+Action CallForward_OnFilterCheckPre(int iClient, char[] sOldName, char[] sNewName, int iCount)
+{
+	Action Result = Plugin_Changed;
+	Call_StartForward(g_hGFwd_OnFilterCheckPre);
+	Call_PushCell(iClient);
+	Call_PushString(sOldName);
+	Call_PushString(sNewName);
+	Call_PushCell(iCount);
+	Call_Finish(Result);
+	return Result;
+}
 
 public void OnPluginStart()
 {
@@ -296,15 +318,16 @@ void OpenMenu(int iClient)
 	FormatEx(szBuffer, sizeof(szBuffer), "%t\n \n", "ReloadConfig");
 	hMenu.AddItem(NULL_STRING, szBuffer);
 
-	char sBuffer[4], sName[64];
+	char sBuffer[4], sName[NICKNAME_COUNT], sNewName[NICKNAME_COUNT];
 	for(int i = 1; i <= MaxClients; i++)
 	{
 		if(IsClientInGame(i) && !IsFakeClient(i))
 		{
 			GetClientName(i, sName, sizeof(sName));
 			IntToString(i, sBuffer, sizeof(sBuffer));
+			strcopy(sNewName, sizeof(sNewName), sName);
 
-			if(CheckClientName(sName, sizeof(sName)) == 0)
+			if(CheckClientName(sNewName, sizeof(sNewName)) == 0)
 			{
 				FormatEx(sName, sizeof(sName), "%N [%t]", i, "NoAdvert");
 				hMenu.AddItem(sBuffer, sName, ITEMDRAW_DISABLED);
@@ -367,10 +390,15 @@ int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 
 					if(iCountKey > 0)
 					{
-						SetGlobalTransTarget(iClient);
-						SetClientName(iTarget, sName);
-						PrintToChat(iClient, "%t", "NicknameChanged", sOldName, sName, iCountKey);
-						LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+						Action Result = CallForward_OnFilterCheckPre(iClient, sOldName, sName, iCountKey);
+
+						if(Result == Plugin_Changed)
+						{
+							SetGlobalTransTarget(iClient);
+							SetClientName(iTarget, sName);
+							PrintToChat(iClient, "%t", "NicknameChanged", sOldName, sName, iCountKey);
+							LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+						}
 					}
 
 					OpenMenu(iClient);
@@ -545,10 +573,15 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 
 	if(iCountKey > 0)
 	{
-		PrintToChat(iClient, "%t", "AutoAdvertFound", iCountKey);
-		LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, sOldName, sNewName, iCountKey);
-		SetClientName(iClient, sNewName);
-		return Plugin_Changed;
+		Action Result = CallForward_OnFilterCheckPre(iClient, sOldName, sNewName, iCountKey);
+
+		if(Result == Plugin_Changed)
+		{
+			PrintToChat(iClient, "%t", "AutoAdvertFound", iCountKey);
+			LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, sOldName, sNewName, iCountKey);
+			SetClientName(iClient, sNewName);
+			return Plugin_Changed;
+		}
 	}
 
 	return Plugin_Continue;
