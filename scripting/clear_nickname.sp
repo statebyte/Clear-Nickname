@@ -10,7 +10,7 @@
 
 #define RECURSIVE_SEARCH 0 // Вкл/выкл рекурсивный поиск (ПОВТОРЯЮЩИЕСЯ КЛЮЧИ)
 #define SENSETIVE false // Чуствительно ли к регистру?
-#define CHECK_NICKNAMESPAM 1 // Проверять на наличиее спама от игроков
+#define CHECK_NICKNAMESPAM 0 // Проверять на наличиее спама от игроков
 #define COUNT_OF_SECONDS 5
 #define COUNT_OF_CHANGES 5
 #define NICKNAME_COUNT 64
@@ -66,7 +66,7 @@ public void OnPluginStart()
 	g_hReplaceKeys = new ArrayList(ByteCountToCells(NICKNAME_COUNT));
 
 	LoadDatabase();
-	HookEventEx("player_changename", Event_NameChanged, EventHookMode_Pre);
+	HookEventEx("player_changename", Event_NameChanged);
 
 	RegConsoleCmd("sm_clearname", cmd_ClearName);
 	RegConsoleCmd("sm_clearname_export", cmd_ClearNameExport);
@@ -556,16 +556,18 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 			{
 				LogToFile(g_sLogPath, "[clear_nickname] Spam Nickname Change %L", iClient);
 				KickClient(iClient, "SPAM NICKNAME");
+				iCount[iClient] = 0;
+				iTime[iClient] = 0;
 				return Plugin_Handled;
 			}
 
 			iCount[iClient]++;
+			iTime[iClient] = GetTime() + COUNT_OF_SECONDS;
 		}
 		else 
 		{
 			//PrintToChatAll("CHECK NAMI CLEAR");
 			iCount[iClient] = 0;
-			iTime[iClient] = GetTime() + COUNT_OF_SECONDS;
 		}
 	}
 	#endif
