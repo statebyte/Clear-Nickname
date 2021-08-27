@@ -62,7 +62,7 @@ public void OnPluginStart()
 	char szBuffer[256];
 	FormatTime(szBuffer, sizeof(szBuffer), "%F", GetTime());
 	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/clear_nickname/log_%s.log", szBuffer);
-	
+
 	g_hReplaceKeys = new ArrayList(ByteCountToCells(NICKNAME_COUNT));
 
 	LoadDatabase();
@@ -91,7 +91,7 @@ Action cmd_ClearNameExport(int iClient, int iArgs)
 {
 	if(g_bDB)
 	{
-		char sPath[PLATFORM_MAX_PATH], szBuffer[256];
+		char sPath[PLATFORM_MAX_PATH];
 		BuildPath(Path_SM, sPath, sizeof(sPath), CONFIG_REPLACE_PATH);
 
 		PrintToServer(sPath);
@@ -102,22 +102,23 @@ Action cmd_ClearNameExport(int iClient, int iArgs)
 
 			if(hFile != null)
 			{
+				int iCount;
+				char sQuery[256], szBuffer[256];
 				Transaction hTxn = new Transaction();
-				
-				int icount;
+
 				while(!hFile.EndOfFile() && hFile.ReadLine(szBuffer, sizeof(szBuffer)))
 				{
 					TrimString(szBuffer);
-					char sQuery[128];
-					
-					g_hDatabase.Format(sQuery, sizeof sQuery, "INSERT INTO %s SET `key_word` = '%s', `account_id` = %i", DB_TABLENAME, szBuffer, iClient == 0 ? 0 : GetSteamAccountID(iClient));
+
+					g_hDatabase.Format(sQuery, sizeof(sQuery), "INSERT INTO %s SET `key_word` = '%s', `account_id` = %i", DB_TABLENAME, szBuffer, iClient == 0 ? 0 : GetSteamAccountID(iClient));
 					hTxn.AddQuery(sQuery);
-					icount++;
+
+					iCount++;
 				}
 
-				g_hDatabase.Execute(hTxn, SQL_TxnCallback_Success, SQL_TxnCallback_Failure, icount);
+				g_hDatabase.Execute(hTxn, SQL_TxnCallback_Success, SQL_TxnCallback_Failure);
 
-				PrintToServer("[clear_nickname] Export: Success loaded - %i keys", icount);
+				PrintToServer("[clear_nickname] Export: Success loaded - %i keys", iCount);
 
 				delete hFile;
 			}
@@ -126,7 +127,6 @@ Action cmd_ClearNameExport(int iClient, int iArgs)
 		else PrintToServer("[clear_nickname] Export: File for export not found");
 	}
 	else PrintToServer("[clear_nickname] Export: DB not enabled");
-	
 
 	return Plugin_Handled;
 }
@@ -178,7 +178,7 @@ void DB_CreateTables()
 		bCrateTables = true;
 
 		char sQuery[1024];
-		g_hDatabase.Format(sQuery, sizeof sQuery, "CREATE TABLE IF NOT EXISTS `%s` ( \
+		g_hDatabase.Format(sQuery, sizeof(sQuery), "CREATE TABLE IF NOT EXISTS `%s` ( \
 				`id` int(11) NOT NULL AUTO_INCREMENT, \
 				`key_word` varchar(64) NOT NULL UNIQUE, \
 				`account_id` int(11) DEFAULT 0, \
@@ -193,17 +193,21 @@ bool DB_CheckDatabaseConnection(const char[] sError, const char[] szErrorTag)
 	if(!g_hDatabase || !strcmp(sError, "Lost connection to MySQL server"))
 	{
 		LogError("%s: %s", szErrorTag, sError);
+
 		delete g_hDatabase;
 		LoadDatabase();
+
 		return false;
 	}
+
 	return true;
 }
 
 void DB_LoadKeys()
 {
 	char sQuery[128];
-	g_hDatabase.Format(sQuery, sizeof sQuery, "SELECT `key_word` FROM %s", DB_TABLENAME);
+
+	g_hDatabase.Format(sQuery, sizeof(sQuery), "SELECT `key_word` FROM %s", DB_TABLENAME);
 	g_hDatabase.Query(SQL_Callback_LoadKeys, sQuery);
 }
 
@@ -249,7 +253,7 @@ void SQL_Callback_LoadKeys(Database hDatabase, DBResultSet hResult, const char[]
 
 Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 {
-	char sValue[32];
+	static char sValue[32];
 	SetGlobalTransTarget(iClient);
 	
 	if(g_bHookMsg[iClient])
@@ -261,6 +265,7 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 
 		LogToFile(g_sLogPath, "%T", "AdminKeyAdded", LANG_SERVER, iClient, sValue);
 		PrintToChat(iClient, "%t%t", "ChatPrefix", "KeyAdded", sValue);
+
 		return Plugin_Handled;
 	}
 
@@ -307,24 +312,29 @@ void OpenMenu(int iClient)
 {
 	char szBuffer[256];
 	Menu hMenu = new Menu(MenuHandler_MyMenu);
-	hMenu.ExitBackButton = true;
+
 	SetGlobalTransTarget(iClient);
 
-	hMenu.SetTitle("%t\n \n", "CheckAdvert");
+	hMenu.SetTitle("%t\n \n ", "CheckAdvert");
+
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "AddSite");
 	hMenu.AddItem(NULL_STRING, szBuffer);
+
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "RefreshList");
 	hMenu.AddItem(NULL_STRING, szBuffer);
-	FormatEx(szBuffer, sizeof(szBuffer), "%t\n \n", "ReloadConfig");
+
+	FormatEx(szBuffer, sizeof(szBuffer), "%t\n \n ", "ReloadConfig");
 	hMenu.AddItem(NULL_STRING, szBuffer);
 
 	char sBuffer[4], sName[NICKNAME_COUNT], sNewName[NICKNAME_COUNT];
+
 	for(int i = 1; i <= MaxClients; i++)
 	{
 		if(IsClientInGame(i) && !IsFakeClient(i))
 		{
+			IntToString(GetClientUserId(i), sBuffer, sizeof(sBuffer));
+
 			GetClientName(i, sName, sizeof(sName));
-			IntToString(i, sBuffer, sizeof(sBuffer));
 			strcopy(sNewName, sizeof(sNewName), sName);
 
 			if(CheckClientName(sNewName, sizeof(sNewName)) == 0)
@@ -338,6 +348,8 @@ void OpenMenu(int iClient)
 			}
 		}
 	}
+
+	hMenu.ExitBackButton = true;
 	hMenu.Display(iClient, MENU_TIME_FOREVER);
 }
 
@@ -376,29 +388,36 @@ int MenuHandler_MyMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 					#define iTarget iItem
 
 					static char szInfo[4];
-					static char sName[NICKNAME_COUNT];
-					static char sOldName[NICKNAME_COUNT];
-
 					hMenu.GetItem(iItem, szInfo, sizeof(szInfo));
 
-					iTarget = StringToInt(szInfo);
+					iTarget = GetClientOfUserId(StringToInt(szInfo));
 
-					GetClientName(iTarget, sName, sizeof(sName));
-					sOldName = sName;
-
-					int iCountKey = CheckClientName(sName, sizeof(sName));
-
-					if(iCountKey > 0)
+					if(iTarget > 0)
 					{
-						Action Result = CallForward_OnFilterCheckPre(iClient, sOldName, sName, iCountKey);
+						static char sName[NICKNAME_COUNT];
+						static char sOldName[NICKNAME_COUNT];
 
-						if(Result == Plugin_Changed)
+						GetClientName(iTarget, sName, sizeof(sName));
+						sOldName = sName;
+
+						int iCountKey = CheckClientName(sName, sizeof(sName));
+
+						if(iCountKey > 0)
 						{
-							SetGlobalTransTarget(iClient);
-							SetClientName(iTarget, sName);
-							PrintToChat(iClient, "%t%t", "ChatPrefix", "NicknameChanged", sOldName, sName, iCountKey);
-							LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+							Action Result = CallForward_OnFilterCheckPre(iClient, sOldName, sName, iCountKey);
+
+							if(Result == Plugin_Changed)
+							{
+								SetGlobalTransTarget(iClient);
+								SetClientName(iTarget, sName);
+								PrintToChat(iClient, "%t%t", "ChatPrefix", "NicknameChanged", sOldName, sName, iCountKey);
+								LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+							}
 						}
+					}
+					else
+					{
+						//сюды добавить сообщение что не валидный игрок
 					}
 
 					OpenMenu(iClient);
@@ -415,11 +434,10 @@ void HookMsg(int iClient)
 	g_bHookMsg[iClient] = true;
 	
 	char szBuffer[128];
-
 	Menu hMenu = new Menu(Handler_HookMenu);
 
 	hMenu.SetTitle("%t\n \n", "AddSite");
-	
+
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "MenuDescription");
 	hMenu.AddItem(NULL_STRING, szBuffer, ITEMDRAW_DISABLED);
 
@@ -439,6 +457,7 @@ int Handler_HookMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 			{
 				OpenMenu(iClient);
 			}
+
 			g_bHookMsg[iClient] = false;
 		}
 	}
@@ -449,12 +468,14 @@ int Handler_HookMenu(Menu hMenu, MenuAction action, int iClient, int iItem)
 Action cmd_ClearName(int iClient, int iArgs)
 {
 	SetGlobalTransTarget(iClient);
+
 	if(iClient > 0)
 	{
 		char sName[NICKNAME_COUNT];
 		GetClientName(iClient, sName, sizeof(sName));
 	
 		int iCountKey = CheckClientName(sName, sizeof(sName));
+
 		if(iCountKey > 0)
 		{
 			SetClientName(iClient, sName);
@@ -521,9 +542,8 @@ public void OnClientPutInServer(int iClient)
 		char sName[NICKNAME_COUNT], sOldName[NICKNAME_COUNT];
 
 		GetClientName(iClient, sName, sizeof(sName));
-
 		sOldName = sName;
-		
+
 		int iCountKey = CheckClientName(sName, sizeof(sName));
 
 		if(iCountKey > 0)
@@ -547,17 +567,18 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 	// Защита от спама игроков
 	#if CHECK_NICKNAMESPAM == 1
 	{
-		static int iTime[MAXPLAYERS+1], iCount[MAXPLAYERS+1];
-		//PrintToChatAll("CHECK %i %i", iTime[iClient], iCount[iClient]);
+		static int iTime[MAXPLAYERS + 1], iCount[MAXPLAYERS + 1];
+
 		if(iTime[iClient] <= GetTime())
 		{
-			//PrintToChatAll("CHECK NAMI %i", iCount[iClient]);
 			if(iCount[iClient] >= COUNT_OF_CHANGES) 
 			{
+				iTime[iClient] = 0;
+				iCount[iClient] = 0;
+
 				LogToFile(g_sLogPath, "[clear_nickname] Spam Nickname Change %L", iClient);
 				KickClient(iClient, "SPAM NICKNAME");
-				iCount[iClient] = 0;
-				iTime[iClient] = 0;
+
 				return Plugin_Handled;
 			}
 
@@ -566,12 +587,10 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 		}
 		else 
 		{
-			//PrintToChatAll("CHECK NAMI CLEAR");
 			iCount[iClient] = 0;
 		}
 	}
 	#endif
-	
 
 	int iCountKey = CheckClientName(sNewName, sizeof(sNewName));
 
@@ -583,7 +602,9 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 		{
 			PrintToChat(iClient, "%t%t", "ChatPrefix", "AutoAdvertFound", iCountKey);
 			LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, sOldName, sNewName, iCountKey);
+
 			SetClientName(iClient, sNewName);
+
 			return Plugin_Changed;
 		}
 	}
@@ -593,24 +614,24 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 
 void AddKey(char[] sKey, int iClient = 0)
 {
+	char szBuffer[PLATFORM_MAX_PATH];
+
 	TrimString(sKey);
-	
+
 	if(g_bDB)
 	{
 		g_hReplaceKeys.PushString(sKey);
-		
-		char sQuery[128];
-		g_hDatabase.Format(sQuery, sizeof sQuery, "INSERT INTO %s SET `key_word` = '%s', `account_id` = %i", DB_TABLENAME, sKey, iClient == 0 ? 0 : GetSteamAccountID(iClient));
-		g_hDatabase.Query(SQL_Default_Callback, sQuery);
+
+		g_hDatabase.Format(szBuffer, sizeof(szBuffer), "INSERT INTO %s SET `key_word` = '%s', `account_id` = %i", DB_TABLENAME, sKey, iClient == 0 ? 0 : GetSteamAccountID(iClient));
+		g_hDatabase.Query(SQL_Default_Callback, szBuffer);
 	}
 	else 
 	{
-		char sPath[PLATFORM_MAX_PATH];
-		BuildPath(Path_SM, sPath, sizeof(sPath), CONFIG_REPLACE_PATH);
+		BuildPath(Path_SM, szBuffer, sizeof(szBuffer), CONFIG_REPLACE_PATH);
 
-		if(FileExists(sPath))
+		if(FileExists(szBuffer))
 		{
-			File hFile = OpenFile(sPath, "a+", false);
+			File hFile = OpenFile(szBuffer, "a+", false);
 
 			if(hFile != null)
 			{
