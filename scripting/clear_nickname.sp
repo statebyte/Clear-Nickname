@@ -231,7 +231,7 @@ void SQL_Callback_LoadKeys(Database hDatabase, DBResultSet hResult, const char[]
 		return;
 	}
 
-	char szBuffer[256];
+	char szBuffer[64];
 
 	while(hResult.FetchRow())
 	{
@@ -516,18 +516,21 @@ void LoadConfig()
 
 public void OnClientPutInServer(int iClient)
 {
-	char sName[NICKNAME_COUNT], sOldName[NICKNAME_COUNT];
+	if(!IsFakeClient(iClient))
+    {
+		char sName[NICKNAME_COUNT], sOldName[NICKNAME_COUNT];
 
-	GetClientName(iClient, sName, sizeof(sName));
+		GetClientName(iClient, sName, sizeof(sName));
 
-	sOldName = sName;
-	
-	int iCountKey = CheckClientName(sName, sizeof(sName));
+		sOldName = sName;
+		
+		int iCountKey = CheckClientName(sName, sizeof(sName));
 
-	if(iCountKey > 0)
-	{
-		SetClientName(iClient, sName);
-		LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+		if(iCountKey > 0)
+		{
+			SetClientName(iClient, sName);
+			LogToFile(g_sLogPath, "%T", "NicknameChanged", LANG_SERVER, sOldName, sName, iCountKey);
+		}
 	}
 }
 
@@ -546,7 +549,7 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 	{
 		static int iTime[MAXPLAYERS+1], iCount[MAXPLAYERS+1];
 		//PrintToChatAll("CHECK %i %i", iTime[iClient], iCount[iClient]);
-		if(iTime[iClient] >= GetTime())
+		if(iTime[iClient] <= GetTime())
 		{
 			//PrintToChatAll("CHECK NAMI %i", iCount[iClient]);
 			if(iCount[iClient] >= COUNT_OF_CHANGES) 
