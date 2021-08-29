@@ -601,7 +601,7 @@ Action Event_NameChanged(Event event, const char[] name, bool dontBroadcast)
 		if(Result == Plugin_Changed)
 		{
 			PrintToChat(iClient, "%t%t", "ChatPrefix", "AutoAdvertFound", iCountKey);
-			LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, iCountKey);
+			LogToFile(g_sLogPath, "%T", "AutoAdvertFound", LANG_SERVER, sOldName, sNewName, iCountKey);
 
 			SetClientName(iClient, sNewName);
 
