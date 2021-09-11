@@ -59,10 +59,6 @@ public void OnPluginStart()
 	BuildPath(Path_SM, sPath, sizeof(sPath), "logs/clear_nickname");
 	if(!DirExists(sPath)) CreateDirectory(sPath, 511);
 
-	char szBuffer[256];
-	FormatTime(szBuffer, sizeof(szBuffer), "%F", GetTime());
-	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/clear_nickname/log_%s.log", szBuffer);
-
 	g_hReplaceKeys = new ArrayList(ByteCountToCells(NICKNAME_COUNT));
 
 	LoadDatabase();
@@ -85,6 +81,13 @@ public void OnPluginStart()
 			OnAdminMenuReady(hTopMenu);
 		}
 	}
+}
+
+public void OnMapStart()
+{
+	char szBuffer[256];
+	FormatTime(szBuffer, sizeof(szBuffer), "%F", GetTime());
+	BuildPath(Path_SM, g_sLogPath, sizeof(g_sLogPath), "logs/clear_nickname/log_%s.log", szBuffer);
 }
 
 Action cmd_ClearNameExport(int iClient, int iArgs)
