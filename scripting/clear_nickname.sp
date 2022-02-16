@@ -8,9 +8,10 @@
 #define DB_NAMESECTION "clear_nickname"
 #define DB_TABLENAME "clear_nickname"
 
-#define RECURSIVE_SEARCH 0 // Вкл/выкл рекурсивный поиск (ПОВТОРЯЮЩИЕСЯ КЛЮЧИ)
+#define RECURSIVE_SEARCH 1 // Вкл/выкл рекурсивный поиск (ПОВТОРЯЮЩИЕСЯ КЛЮЧИ)
 #define SENSETIVE false // Чуствительно ли к регистру?
 #define CHECK_NICKNAMESPAM 0 // Проверять на наличиее спама от игроков
+#define CLEAR_CLANTAGS 0
 #define COUNT_OF_SECONDS 5
 #define COUNT_OF_CHANGES 5
 #define NICKNAME_COUNT 64
@@ -25,7 +26,7 @@ Handle g_hGFwd_OnFilterCheckPre;
 public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
-	author	=	"FIVE, Domikuss",
+	author	=	"FIVE, Domikuss, Faya",
 	version	=	"1.1.0",
 	url		=	"https://hlmod.ru"
 };
@@ -79,9 +80,8 @@ public void OnPluginStart()
 	if(LibraryExists("adminmenu"))
 	{
 		TopMenu hTopMenu;
-		if((hTopMenu = GetAdminTopMenu()) != null) // Если админ-меню уже создано
+		if((hTopMenu = GetAdminTopMenu()) != null)
 		{
-			// Вызываем ф-ю, в которой добавляется пункт в админ-меню
 			OnAdminMenuReady(hTopMenu);
 		}
 	}
@@ -155,11 +155,11 @@ void LoadDatabase()
 	}
 }
 
-void ConnectCallBack(Database hDB, const char[] szError, any data) // Пришел результат соединения
+void ConnectCallBack(Database hDB, const char[] szError, any data)
 {
-	if(hDB == null || szError[0]) // Соединение не удачное
+	if(hDB == null || szError[0])
 	{
-		SetFailState("Database failure: %s", szError); // Отключаем плагин
+		SetFailState("Database failure: %s", szError);
 		return;
 	}
 
@@ -259,12 +259,17 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 	if(g_bHookMsg[iClient])
 	{
 		GetCmdArg(1, sValue, sizeof(sValue));
-		AddKey(sValue, iClient);
-		g_bHookMsg[iClient] = false;
-		OpenMenu(iClient);
 
-		LogToFile(g_sLogPath, "%T", "AdminKeyAdded", LANG_SERVER, iClient, sValue);
-		PrintToChat(iClient, "%t%t", "ChatPrefix", "KeyAdded", sValue);
+		if(sValue[0] && strlen(sValue) > 2)
+		{
+			AddKey(sValue, iClient);
+			g_bHookMsg[iClient] = false;
+			OpenMenu(iClient);
+
+			LogToFile(g_sLogPath, "%T", "AdminKeyAdded", LANG_SERVER, iClient, sValue);
+			PrintToChat(iClient, "%t%t", "ChatPrefix", "KeyAdded", sValue);
+		}
+		else PrintToChat(iClient, "%t%t", "ChatPrefix", "KeyAdded_Failed");
 
 		return Plugin_Handled;
 	}

@@ -58,6 +58,13 @@
 		"ua"        "Ключ {1} успішно доданий!"
 	}
 
+	"KeyAdded_Failed"
+	{
+		"en"        "Error! The key must not be empty and have more than 3 characters"
+		"ru"        "Ошибка! Ключ не должен быть пустой и иметь более 3-х символов"
+		"ua"        "Помилка! Ключ не повинен бути порожнім і мати більше 3-х символів"
+	}
+
 	"AdminKeyAdded"
 	{
 		"#format"	"{1:L},{2:s}"
