@@ -60,9 +60,9 @@
 
 	"KeyAdded_Failed"
 	{
-		"en"        "Error! The key must not be empty and have more than 3 characters"
-		"ru"        "Ошибка! Ключ не должен быть пустой и иметь более 3-х символов"
-		"ua"        "Помилка! Ключ не повинен бути порожнім і мати більше 3-х символів"
+		"en"        "Error! The key must not be empty and have less than 3 characters!"
+		"ru"        "Ошибка! Ключ не должен быть пустой и иметь менее 3-х символов!"
+		"ua"        "Помилка! Ключ не повинен бути порожній і мати менше 3-х символів!"
 	}
 
 	"AdminKeyAdded"
