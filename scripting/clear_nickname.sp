@@ -263,6 +263,8 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 	{
 		GetCmdArg(1, sValue, sizeof(sValue));
 
+		TrimString(sValue);
+
 		if(sValue[0] && strlen(sValue) > 2)
 		{
 			AddKey(sValue, iClient);
