@@ -27,7 +27,7 @@ public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
 	author	=	"FIVE, Domikuss, Faya",
-	version	=	"1.1.0",
+	version	=	"1.1.1",
 	url		=	"https://hlmod.ru"
 };
 
@@ -261,7 +261,9 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 	
 	if(iClient >= 0 && g_bHookMsg[iClient])
 	{
-		GetCmdArg(1, sValue, sizeof(sValue));
+		GetCmdArgString(sValue, sizeof(sValue));
+
+		ReplaceString(sValue, sizeof(sValue), "\"", "");
 
 		TrimString(sValue);
 
@@ -446,6 +448,8 @@ void HookMsg(int iClient)
 	char szBuffer[128];
 	Menu hMenu = new Menu(Handler_HookMenu);
 
+	SetGlobalTransTarget(iClient);
+
 	hMenu.SetTitle("%t\n \n", "AddSite");
 
 	FormatEx(szBuffer, sizeof(szBuffer), "%t", "MenuDescription");
@@ -548,7 +552,7 @@ void LoadConfig()
 public void OnClientPutInServer(int iClient)
 {
 	if(!IsFakeClient(iClient))
-    {
+	{
 		char sName[NICKNAME_COUNT], sOldName[NICKNAME_COUNT];
 
 		GetClientName(iClient, sName, sizeof(sName));
