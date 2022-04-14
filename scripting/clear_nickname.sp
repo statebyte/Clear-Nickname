@@ -259,7 +259,7 @@ Action Command_Say(int iClient, const char[] sCommand, int iArgs)
 	static char sValue[32];
 	SetGlobalTransTarget(iClient);
 	
-	if(g_bHookMsg[iClient])
+	if(iClient >= 0 && g_bHookMsg[iClient])
 	{
 		GetCmdArg(1, sValue, sizeof(sValue));
 
