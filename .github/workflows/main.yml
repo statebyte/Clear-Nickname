@@ -43,8 +43,7 @@ jobs:
 
       - name: Zip output
         run: |
-          cd plugins
-          zip -qq -r clear_nickname-${{ steps.setup_sp.outputs.plugin-version }}.zip clear_nickname.smx
+          zip -qq -r clear_nickname-${{ steps.setup_sp.outputs.plugin-version }}.zip configs plugins translations
         working-directory: ${{ env.SCRIPTS_PATH }}
 
       - name: Create Release
@@ -54,7 +53,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: v${{ steps.setup_sp.outputs.plugin-version }}
-          artifacts: "./plugins/clear_nickname-${{ steps.setup_sp.outputs.plugin-version }}.zip"
+          artifacts: "clear_nickname-${{ steps.setup_sp.outputs.plugin-version }}.zip"
           body: ${{ steps.changelog.outputs.changes }}
           draft: false
           allowUpdates: true
