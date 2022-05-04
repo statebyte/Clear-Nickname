@@ -27,7 +27,7 @@ public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
 	author	=	"FIVE, Domikuss, Faya",
-	version	=	"1.1.1",
+	version	=	"1.1.2",
 	url		=	"https://hlmod.ru"
 };
 
@@ -533,7 +533,7 @@ void LoadConfig()
 				while(!hFile.EndOfFile() && hFile.ReadLine(szBuffer, sizeof(szBuffer))) 
 				{
 					TrimString(szBuffer);
-					g_hReplaceKeys.PushString(szBuffer);
+					if(szBuffer[0] && strlen(szBuffer) > 3) g_hReplaceKeys.PushString(szBuffer);
 				}
 
 				delete hFile;
