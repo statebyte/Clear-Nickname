@@ -1,6 +1,12 @@
 ## Release Notes
 
-## [1.1.1]
+## [1.1.3]
+
+### Fixed
+
+- Fix Invalid query Handle 0 (error: 4).
+
+## [1.1.2]
 
 ### Fixed
 

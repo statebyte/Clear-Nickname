@@ -27,7 +27,7 @@ public Plugin myinfo =
 {
 	name	=	"Clear Nickname",
 	author	=	"FIVE, Domikuss, Faya",
-	version	=	"1.1.2",
+	version	=	"1.1.3",
 	url		=	"https://hlmod.ru"
 };
 
@@ -239,6 +239,8 @@ void SQL_Callback_LoadKeys(Database hDatabase, DBResultSet hResult, const char[]
 	}
 
 	char szBuffer[64];
+
+	if(hResult.RowCount == 0) return;
 
 	while(hResult.FetchRow())
 	{
